@@ -1,0 +1,5 @@
+out*.png
+*.prototxt*
+*.caffemodel
+models/
+!models/download_models.sh
