@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tensorflow as tf   #
 import numpy as np
 import scipy.io
 import scipy.misc
@@ -7,11 +7,11 @@ import os
 
 IMAGE_W = 800 
 IMAGE_H = 600 
-CONTENT_IMG =  './images/Taipei101.jpg'
-STYLE_IMG = './images/StarryNight.jpg'
+CONTENT_IMG =  './content/bikini_big.jpg'
+STYLE_IMG = './style/style-bikini.jpg'
 OUTOUT_DIR = './results'
 OUTPUT_IMG = 'results.png'
-VGG_MODEL = 'imagenet-vgg-verydeep-19.mat'
+VGG_MODEL = 'models/imagenet-vgg-verydeep-19.mat'
 INI_NOISE_RATIO = 0.7
 STYLE_STRENGTH = 500
 ITERATION = 5000
@@ -134,7 +134,7 @@ def main():
     sess.run(train)
     if i%100 ==0:
       result_img = sess.run(net['input'])
-      print sess.run(cost_total)
+      print (sess.run(cost_total))
       write_image(os.path.join(OUTOUT_DIR,'%s.png'%(str(i).zfill(4))),result_img)
   
   write_image(os.path.join(OUTOUT_DIR,OUTPUT_IMG),result_img)
