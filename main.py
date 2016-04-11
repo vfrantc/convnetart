@@ -1,28 +1,47 @@
-import tensorflow as tf   #
+import tensorflow as tf
 import numpy as np
 import scipy.io
 import scipy.misc
 import os
 
+'''Желаемые размеры изображения'''
+IMAGE_W = 320
+IMAGE_H = 240
 
-IMAGE_W = 800 
-IMAGE_H = 600 
-CONTENT_IMG =  './content/bikini_big.jpg'
+
+CONTENT_IMG =  './content/Bikini.jpg'
 STYLE_IMG = './style/style-bikini.jpg'
+
+'''Выходные результаты'''
 OUTOUT_DIR = './results'
 OUTPUT_IMG = 'results.png'
-VGG_MODEL = 'models/imagenet-vgg-verydeep-19.mat'
-INI_NOISE_RATIO = 0.7
-STYLE_STRENGTH = 500
-ITERATION = 5000
 
+'''Используемая сеть. Она хоть и меньше сети крыжевского по количеству параметров, но ...'''
+VGG_MODEL = 'models/imagenet-vgg-verydeep-19.mat'
+INI_NOISE_RATIO = 0.7 # Начальная дисперсия шума
+STYLE_STRENGTH = 500  # Коэффициент стиля? Фактически это множитель лагранджа, или я что-то не так понимаю?
+ITERATION = 5000      # Количество итераций. От чего зависит сходимость?
+
+'''Для удобства, вот список слоев.
+input conv1_1 conv1_2 pool1
+conv2_1 conv2_2 pool2
+conv3_1 conv3_2 conv3_3 conv3_4 pool3
+conv4_1 conv4_2 conv4_3 conv4_4 pool4
+conv5_1 conv5_2 conv5_3 conv5_4 pool5
+'''
+
+'''
 CONTENT_LAYERS =[('conv4_2',1.)]
 STYLE_LAYERS=[('conv1_1',1.),('conv2_1',1.5),('conv3_1',2.),('conv4_1',2.5),('conv5_1',3.)]
+'''
 
+CONTENT_LAYERS =[('conv4_2',1.)]
+STYLE_LAYERS=[('conv1_1',1.),('conv2_1',1.),('conv3_1',1.),('conv4_1',1.),('conv5_1',1.)]
 
-MEAN_VALUES = np.array([123, 117, 104]).reshape((1,1,1,3))
+MEAN_VALUES = np.array([123, 117, 104]).reshape((1,1,1,3))  # Средние значения для всего набора!!!!!
 
 def build_net(ntype, nin, nwb=None):
+  '''Построить сеть:'''
   if ntype == 'conv':
     return tf.nn.relu(tf.nn.conv2d(nin, nwb[0], strides=[1, 1, 1, 1], padding='SAME')+ nwb[1])
   elif ntype == 'pool':
@@ -88,8 +107,6 @@ def build_style_loss(a, x):
   G = gram_matrix(x, M, N )
   loss = (1./(4 * N**2 * M**2)) * tf.reduce_sum(tf.pow((G - A),2))
   return loss
-
-
 
 def read_image(path):
   image = scipy.misc.imread(path)
